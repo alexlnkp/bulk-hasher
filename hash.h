@@ -30,12 +30,14 @@ size_t C_check_hashes_against_file(const char* hash_list_filename);
 static PyObject* hash_file(PyObject* self, PyObject* args);
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args);
 static PyObject* regenerate_hashes(PyObject* self, PyObject* args);
+static PyObject* get_hash_from_file(PyObject* self, PyObject* args);
 static PyObject* version(PyObject* self);
 
 static PyMethodDef HashMethods[] = {
     {"hash_file", (PyCFunction)hash_file, METH_VARARGS, "Get the SHA256 hash of the file specified"},
     {"check_hashes_against_file", (PyCFunction)check_hashes_against_file, METH_VARARGS, "Check all files in the file specified against corresponding SHA256 hashes, returns the number of mismatched hashes"},
     {"regenerate_hashes", (PyCFunction)regenerate_hashes, METH_VARARGS, "Regenerate SHA256 hashes for all files in the directory specified, writing the results to the specified file"},
+    {"get_hash_from_file", (PyCFunction)get_hash_from_file, METH_VARARGS, "Get the SHA256 hash of the file specified in the sha256 file"},
     {"version", (PyCFunction)version, METH_NOARGS, "Get the version of the program"},
     {NULL, NULL, 0, NULL}
 };

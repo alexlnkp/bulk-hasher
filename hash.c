@@ -301,6 +301,30 @@ size_t C_check_hashes_against_file(const char* hash_list_filename) {
     return mismatched_hashes;
 }
 
+/// @brief Checks the SHA256 hashes against the file specified
+/// @param file_to_hash File hash of which to get from the sha_file
+/// @param sha_file File containing SHA256 hashes
+/// @return The stored hash of the file_to_hash
+char* C_get_hash_from_file(char* file_to_hash, char* sha_file) {
+    FILE* fp = fopen(sha_file, "r");
+    // find the file_to_hash in the sha_file
+    if (fp == NULL) { PyErr_SetFromErrno(PyExc_OSError); return NULL; }
+    char line[READ_BUFFER];
+    while (fgets(line, READ_BUFFER, fp) != NULL) {
+        if (strstr(line, file_to_hash) != NULL) {
+            char* newline = strchr(line, '\n');
+            if (newline) *newline = '\0';
+
+            char* filename = strtok(line, " = ");
+            char* stored_hash = strtok(NULL, " = ");
+            fclose(fp);
+            return strdup(stored_hash);
+        }
+    }
+    fclose(fp);
+    return NULL;
+}
+
 // Python bindings
 static PyObject* hash_file(PyObject* self, PyObject* args) {
     const char* filename;
@@ -326,6 +350,11 @@ static PyObject* regenerate_hashes(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
     C_regenerate_hashes(path, out_file);
     Py_INCREF(Py_None); return Py_None;
+}
+static PyObject* get_hash_from_file(PyObject* self, PyObject* args) {
+    char* file_to_hash; char* sha_file;
+    if (!PyArg_ParseTuple(args, "ss", &file_to_hash, &sha_file)) return NULL;
+    return Py_BuildValue("s", C_get_hash_from_file(file_to_hash, sha_file));
 }
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "0.0.1");
