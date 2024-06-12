@@ -31,7 +31,7 @@ static PyMethodDef HashMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-static struct PyModuleDef hashmodule = {
+static struct PyModuleDef bulkhashermodule = {
     PyModuleDef_HEAD_INIT,
     "hash",
     "SHA256 hashing module",
@@ -39,8 +39,8 @@ static struct PyModuleDef hashmodule = {
     HashMethods
 };
 
-PyMODINIT_FUNC PyInit_hasher() {
-    return PyModule_Create(&hashmodule);
+PyMODINIT_FUNC PyInit_bulkhasher() {
+    return PyModule_Create(&bulkhashermodule);
 }
 
 #endif // HASH_H
