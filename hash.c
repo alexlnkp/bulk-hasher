@@ -6,18 +6,15 @@
 
 #include "hash.h"
 
-#define BUFFER_SIZE  16384 // 16 KiB buffer for reading files
-#define FILES_TO_STORE 256 // Maximum number of files to store in memory
-#define READ_BUFFER   4096 // Read at most 4 KiB per line
-
-#define PARALLEL_PROCESSES 16
-#define PARALLEL_WORKERS 8
-
 #define CHECK_ALLOC(x, y) \
     if (x == NULL) { PyErr_NoMemory(); return y; }
 
 omp_lock_t lock;
 
+/// @brief Checks if a string ends with another string
+/// @param s String to check
+/// @param t String to check against
+/// @return 1 if s ends with t, 0 otherwise
 int strend(const char *s, const char *t) {
     size_t ls = strlen(s); // find length of s
     size_t lt = strlen(t); // find length of t
@@ -28,7 +25,9 @@ int strend(const char *s, const char *t) {
     return 0; // t was longer than s
 }
 
-// Hash a file using SHA256
+/// @brief Hashes a file in fp and stores the hash in ctx
+/// @param fp File stream to hash
+/// @param ctx Hashing context to write to
 void hash_file(FILE *fp, sha256_ctx *ctx) {
     unsigned char buffer[BUFFER_SIZE];
     size_t bytes_read = 0;
@@ -37,6 +36,9 @@ void hash_file(FILE *fp, sha256_ctx *ctx) {
     sha256_final(ctx, ctx->block);
 }
 
+/// @brief Converts a SHA256 byte hash to a string
+/// @param hash SHA256 hash
+/// @param hash_str pointer to a string to store the hash in
 void convert_hash_to_str(unsigned char* hash, char* hash_str) {
     // Convert each byte of the hash to a 2-character hexadecimal string
     for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
@@ -45,6 +47,9 @@ void convert_hash_to_str(unsigned char* hash, char* hash_str) {
     hash_str[SHA256_DIGEST_SIZE * 2] = '\0';
 }
 
+/// @brief Hashes all files in the HashingDirectory dir
+/// @param dir HashingDirectory to hash
+/// @return Array of hashed files
 char** hash_files(HashingDirectory* dir) {
     omp_set_num_threads(PARALLEL_PROCESSES);
 
@@ -105,7 +110,11 @@ void free_stack(StackNode** top) {
         free(path);
     }
 }
+// --------------------------------------
 
+/// @brief Gets all filenames recursively from the directory specified
+/// @param root_path Directory to get filenames from
+/// @return HashingDirectory with all the filenames
 HashingDirectory* get_filenames(char* root_path) {
     HashingDirectory* directories = malloc(sizeof(HashingDirectory));
     if (!directories) return NULL;
@@ -196,6 +205,9 @@ HashingDirectory* get_filenames(char* root_path) {
     return directories;
 }
 
+/// @brief Regenerates SHA256 hashes for all files in the directory specified
+/// @param path Directory to get filenames from
+/// @param out_file File to write the hashes to
 void Cregenerate_hashes(char* path, char* out_file) {
     omp_set_num_threads(PARALLEL_PROCESSES);
 
@@ -227,6 +239,9 @@ void Cregenerate_hashes(char* path, char* out_file) {
     free(hashes);
 }
 
+/// @brief Checks the SHA256 hashes against the file specified in the line
+/// @param line Line of the file
+/// @return Number of mismatched hashes
 size_t process_line_of_SHA256_file(char* line) {
     sha256_ctx ctx;
     sha256_init(&ctx);
@@ -268,6 +283,9 @@ size_t process_line_of_SHA256_file(char* line) {
     return mismatched_hashes;
 }
 
+/// @brief Checks all SHA256 hashes against the file specified
+/// @param hash_list_filename File containing SHA256 hashes
+/// @return Number of mismatched hashes
 size_t Ccheck_hashes_against_file(const char* hash_list_filename) {
     size_t mismatched_hashes = 0;
 
@@ -283,28 +301,20 @@ size_t Ccheck_hashes_against_file(const char* hash_list_filename) {
     return mismatched_hashes;
 }
 
+// Python bindings
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
     const char* hash_list_filename;
     if (!PyArg_ParseTuple(args, "s", &hash_list_filename)) return NULL;
     return PyLong_FromSize_t(Ccheck_hashes_against_file(hash_list_filename));
 
 }
-
 static PyObject* regenerate_hashes(PyObject* self, PyObject* args) {
     const char* path; const char* out_file;
     if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
     Cregenerate_hashes(path, out_file);
     Py_INCREF(Py_None); return Py_None;
 }
-
 static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "0.0.1");
 }
-
-int main(void) {
-    size_t mismatched_hashes = Ccheck_hashes_against_file("SHA256");
-    printf("Number of mismatched hashes: %zu\n", mismatched_hashes);
-
-    // regenerate_hashes("assets");
-    return 0;
-}
+// ---------------

@@ -1,6 +1,13 @@
 #ifndef HASH_H
 #define HASH_H
 
+#define BUFFER_SIZE  16384 // 16 KiB buffer for reading files
+#define FILES_TO_STORE 256 // Maximum number of files to store in memory
+#define READ_BUFFER   4096 // Read at most 4 KiB per line
+
+#define PARALLEL_PROCESSES 16
+#define PARALLEL_WORKERS 8
+
 typedef struct HashingDirectory {
     size_t num_files;
     char** files;
