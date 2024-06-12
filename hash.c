@@ -1,7 +1,10 @@
 #include <Python.h>
 #include <omp.h>
 #include <dirent.h>
+#include <stdbool.h>
 #include "sha2.h"
+
+#include "hash.h"
 
 #define BUFFER_SIZE  16384 // 16 KiB buffer for reading files
 #define FILES_TO_STORE 256 // Maximum number of files to store in memory
@@ -15,8 +18,6 @@
 
 omp_lock_t lock;
 
-// typedef unsigned char unsigned char;
-
 int strend(const char *s, const char *t) {
     size_t ls = strlen(s); // find length of s
     size_t lt = strlen(t); // find length of t
@@ -26,16 +27,6 @@ int strend(const char *s, const char *t) {
     }
     return 0; // t was longer than s
 }
-
-typedef struct HashingDirectory {
-    size_t num_files;
-    char** files;
-} HashingDirectory;
-
-typedef struct StackNode {
-    char* path;
-    struct StackNode* next;
-} StackNode;
 
 // Hash a file using SHA256
 void hash_file(FILE *fp, sha256_ctx *ctx) {
@@ -274,7 +265,7 @@ size_t process_line_of_SHA256_file(char* line) {
     return mismatched_hashes;
 }
 
-size_t check_hashes_against_file(const char* hash_list_filename) {
+size_t Ccheck_hashes_against_file(const char* hash_list_filename) {
     size_t mismatched_hashes = 0;
 
     FILE* file = fopen(hash_list_filename, "r");
@@ -289,10 +280,21 @@ size_t check_hashes_against_file(const char* hash_list_filename) {
     return mismatched_hashes;
 }
 
+static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
+    const char* hash_list_filename;
+    if (!PyArg_ParseTuple(args, "s", &hash_list_filename)) return NULL;
+    return PyLong_FromSize_t(Ccheck_hashes_against_file(hash_list_filename));
+
+}
+
+static PyObject* version(PyObject* self) {
+    return Py_BuildValue("s", "0.0.1");
+}
+
 int main(void) {
-    size_t mismatched_hashes = check_hashes_against_file("SHA256");
+    size_t mismatched_hashes = Ccheck_hashes_against_file("SHA256");
     printf("Number of mismatched hashes: %zu\n", mismatched_hashes);
-    
+
     // regenerate_hashes("assets");
     return 0;
 }
