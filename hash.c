@@ -28,7 +28,7 @@ int strend(const char *s, const char *t) {
 /// @brief Hashes a file in fp and stores the hash in ctx
 /// @param fp File stream to hash
 /// @param ctx Hashing context to write to
-void hash_file(FILE *fp, sha256_ctx *ctx) {
+void Chash_file(FILE *fp, sha256_ctx *ctx) {
     unsigned char buffer[BUFFER_SIZE];
     size_t bytes_read = 0;
     while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, fp)) > 0)
@@ -75,7 +75,7 @@ char** hash_files(HashingDirectory* dir) {
             continue;
         }
 
-        hash_file(fp, &ctx);
+        Chash_file(fp, &ctx);
         convert_hash_to_str(ctx.block, hashes[i]);
 
         fclose(fp);
@@ -260,7 +260,7 @@ size_t process_line_of_SHA256_file(char* line) {
         FILE* fp = fopen(filename, "r");
         if (fp == NULL) { PyErr_SetFromErrno(PyExc_OSError); printf("Error opening file: %s\n", filename); return 0; }
 
-        hash_file(fp, &ctx);
+        Chash_file(fp, &ctx);
 
         if (ferror(fp)) {
             printf("Error reading file: %s\n", filename);
@@ -302,6 +302,20 @@ size_t Ccheck_hashes_against_file(const char* hash_list_filename) {
 }
 
 // Python bindings
+static PyObject* hash_file(PyObject* self, PyObject* args) {
+    const char* filename;
+    if (!PyArg_ParseTuple(args, "s", &filename)) return NULL;
+    FILE* fp = fopen(filename, "r");
+    if (fp == NULL) { PyErr_SetFromErrno(PyExc_OSError); return NULL; }
+    sha256_ctx ctx;
+    sha256_init(&ctx);
+    Chash_file(fp, &ctx);
+    fclose(fp);
+    char hash_str[SHA256_DIGEST_SIZE * 2 + 1];
+    convert_hash_to_str(ctx.block, hash_str);
+    return Py_BuildValue("s", hash_str);
+}
+
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
     const char* hash_list_filename;
     if (!PyArg_ParseTuple(args, "s", &hash_list_filename)) return NULL;
