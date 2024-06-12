@@ -196,13 +196,13 @@ HashingDirectory* get_filenames(char* root_path) {
     return directories;
 }
 
-void regenerate_hashes(char* path) {
+void Cregenerate_hashes(char* path, char* out_file) {
     omp_set_num_threads(PARALLEL_PROCESSES);
 
     HashingDirectory* files = get_filenames(path);
     char** hashes = hash_files(files);
 
-    FILE* fp = fopen("SHA256", "w");
+    FILE* fp = fopen(out_file, "w");
     if (fp == NULL) {
         PyErr_SetFromErrno(PyExc_OSError);
         fprintf(stderr, "Error opening file: %s\n", strerror(errno));
@@ -220,6 +220,9 @@ void regenerate_hashes(char* path) {
         free(hashes[i]);
     }
 
+    fclose(fp);
+
+    free(files->files);
     free(files);
     free(hashes);
 }
@@ -285,6 +288,13 @@ static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "s", &hash_list_filename)) return NULL;
     return PyLong_FromSize_t(Ccheck_hashes_against_file(hash_list_filename));
 
+}
+
+static PyObject* regenerate_hashes(PyObject* self, PyObject* args) {
+    const char* path; const char* out_file;
+    if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
+    Cregenerate_hashes(path, out_file);
+    Py_INCREF(Py_None); return Py_None;
 }
 
 static PyObject* version(PyObject* self) {
