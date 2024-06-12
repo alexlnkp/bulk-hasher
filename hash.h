@@ -26,6 +26,7 @@ HashingDirectory* get_filenames(char* root_path);
 
 void C_regenerate_hashes(char* path, char* out_file);
 size_t C_check_hashes_against_file(const char* hash_list_filename);
+char* C_get_hash_from_file(char* file_to_hash, char* sha_file);
 
 static PyObject* hash_file(PyObject* self, PyObject* args);
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args);
