@@ -6,7 +6,6 @@
 #define READ_BUFFER   4096 // Read at most 4 KiB per line
 
 #define PARALLEL_PROCESSES 16
-#define PARALLEL_WORKERS 8
 
 typedef struct HashingDirectory {
     size_t num_files;
