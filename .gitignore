@@ -1,0 +1,7 @@
+.vscode
+assets
+build
+hasher
+gmon.out
+sha256.env
+SHA256
