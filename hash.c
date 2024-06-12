@@ -28,7 +28,7 @@ int strend(const char *s, const char *t) {
 /// @brief Hashes a file in fp and stores the hash in ctx
 /// @param fp File stream to hash
 /// @param ctx Hashing context to write to
-void Chash_file(FILE *fp, sha256_ctx *ctx) {
+void C_hash_file(FILE *fp, sha256_ctx *ctx) {
     unsigned char buffer[BUFFER_SIZE];
     size_t bytes_read = 0;
     while ((bytes_read = fread(buffer, 1, BUFFER_SIZE, fp)) > 0)
@@ -75,7 +75,7 @@ char** hash_files(HashingDirectory* dir) {
             continue;
         }
 
-        Chash_file(fp, &ctx);
+        C_hash_file(fp, &ctx);
         convert_hash_to_str(ctx.block, hashes[i]);
 
         fclose(fp);
@@ -208,7 +208,7 @@ HashingDirectory* get_filenames(char* root_path) {
 /// @brief Regenerates SHA256 hashes for all files in the directory specified
 /// @param path Directory to get filenames from
 /// @param out_file File to write the hashes to
-void Cregenerate_hashes(char* path, char* out_file) {
+void C_regenerate_hashes(char* path, char* out_file) {
     omp_set_num_threads(PARALLEL_PROCESSES);
 
     HashingDirectory* files = get_filenames(path);
@@ -260,7 +260,7 @@ size_t process_line_of_SHA256_file(char* line) {
         FILE* fp = fopen(filename, "r");
         if (fp == NULL) { PyErr_SetFromErrno(PyExc_OSError); printf("Error opening file: %s\n", filename); return 0; }
 
-        Chash_file(fp, &ctx);
+        C_hash_file(fp, &ctx);
 
         if (ferror(fp)) {
             printf("Error reading file: %s\n", filename);
@@ -286,7 +286,7 @@ size_t process_line_of_SHA256_file(char* line) {
 /// @brief Checks all SHA256 hashes against the file specified
 /// @param hash_list_filename File containing SHA256 hashes
 /// @return Number of mismatched hashes
-size_t Ccheck_hashes_against_file(const char* hash_list_filename) {
+size_t C_check_hashes_against_file(const char* hash_list_filename) {
     size_t mismatched_hashes = 0;
 
     FILE* file = fopen(hash_list_filename, "r");
@@ -309,23 +309,22 @@ static PyObject* hash_file(PyObject* self, PyObject* args) {
     if (fp == NULL) { PyErr_SetFromErrno(PyExc_OSError); return NULL; }
     sha256_ctx ctx;
     sha256_init(&ctx);
-    Chash_file(fp, &ctx);
+    C_hash_file(fp, &ctx);
     fclose(fp);
     char hash_str[SHA256_DIGEST_SIZE * 2 + 1];
     convert_hash_to_str(ctx.block, hash_str);
     return Py_BuildValue("s", hash_str);
 }
-
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
     const char* hash_list_filename;
     if (!PyArg_ParseTuple(args, "s", &hash_list_filename)) return NULL;
-    return PyLong_FromSize_t(Ccheck_hashes_against_file(hash_list_filename));
+    return PyLong_FromSize_t(C_check_hashes_against_file(hash_list_filename));
 
 }
 static PyObject* regenerate_hashes(PyObject* self, PyObject* args) {
-    const char* path; const char* out_file;
+    char* path; char* out_file;
     if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
-    Cregenerate_hashes(path, out_file);
+    C_regenerate_hashes(path, out_file);
     Py_INCREF(Py_None); return Py_None;
 }
 static PyObject* version(PyObject* self) {

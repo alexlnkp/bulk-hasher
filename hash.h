@@ -20,13 +20,13 @@ typedef struct StackNode {
 
 void convert_hash_to_str(unsigned char* hash, char* hash_str);
 
-void Chash_file(FILE *fp, sha256_ctx *ctx);
+void C_hash_file(FILE *fp, sha256_ctx *ctx);
 char** hash_files(HashingDirectory* dir);
 
 HashingDirectory* get_filenames(char* root_path);
 
-void Cregenerate_hashes(char* path, char* out_file);
-size_t Ccheck_hashes_against_file(const char* hash_list_filename);
+void C_regenerate_hashes(char* path, char* out_file);
+size_t C_check_hashes_against_file(const char* hash_list_filename);
 
 static PyObject* hash_file(PyObject* self, PyObject* args);
 static PyObject* check_hashes_against_file(PyObject* self, PyObject* args);
@@ -46,7 +46,8 @@ static struct PyModuleDef bulkhashermodule = {
     "hash",
     "SHA256 hashing module",
     -1,
-    HashMethods
+    HashMethods,
+    .m_slots = NULL,
 };
 
 PyMODINIT_FUNC PyInit_bulkhasher() {
