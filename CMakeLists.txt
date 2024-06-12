@@ -7,6 +7,7 @@ find_package(OpenMP REQUIRED)
 
 # Define the new shared library target
 add_library(bulkhasher MODULE hash.c sha2.c)
+target_compile_options(bulkhasher PRIVATE -Wall -Wextra -Wpedantic -O3 -flto -fopenmp -Wno-unused-parameter)
 
 # Include Python headers and OpenMP
 target_include_directories(bulkhasher PRIVATE ${Python3_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
