@@ -17,10 +17,12 @@ jobs:
       run: >-
         python3 -m
         pip install
-        build
+        build auditwheel
         --user
     - name: Build a binary wheel and a source tarball
       run: ./autobuild
+    - name: Convert binary wheel to manylinux
+      run: auditwheel repair dist/*.whl
     - name: Store the distribution packages
       uses: actions/upload-artifact@v3
       with:
