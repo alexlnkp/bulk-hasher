@@ -13,8 +13,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.x"
-    - name: Run docker
-      run: docker run -v `pwd`:/io quay.io/pypa/manylinux1_x86_64 /bin/bash
+    - name: Pull docker image
+      run: docker pull quay.io/pypa/manylinux2014_x86_64
+    - name: Run docker container
+      run: docker run --rm -v `pwd`:/io quay.io/pypa/manylinux2014_x86_64 /bin/bash
+    - name: Install everything necessary
+      run: yum install -y python3 gcc cmake openmpi-devel
     - name: Install pypa/build
       run: >-
         python3 -m
