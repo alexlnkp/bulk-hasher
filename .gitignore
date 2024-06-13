@@ -8,3 +8,7 @@ sha256.env
 SHA256
 
 *.so
+*.egg-info
+dist
+
+__pycache__
