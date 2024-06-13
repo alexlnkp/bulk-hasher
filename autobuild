@@ -1,6 +1,16 @@
 #!/bin/bash
 
+if [[ ! -d ".venv" ]]; then
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r build.req
+fi
+
+source .venv/bin/activate
+
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release --parallel
 
-ln -sf build/bulkhasher.so bulkhasher.so
+export PREBUILT_BINARY=$(pwd)/build/bulkhasher.so
+
+python -m build
