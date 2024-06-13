@@ -16,5 +16,3 @@ cp build/bulkhasher.* bulkhasher/
 export PREBUILT_BINARY=$(pwd)/build/bulkhasher.so
 
 python -m build
-
-pip install --force-reinstall dist/bulkhasher-0.0.2-cp312-cp312-linux_x86_64.whl 
