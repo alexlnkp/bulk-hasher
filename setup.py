@@ -11,6 +11,7 @@ setup(
     name = 'bulkhasher',
     version = '0.0.2',
     description = 'Module for bulk hashing of files',
+    long_description="Made on C",
     author = 'Alex Murkoff',
     author_email = '413x1nkp@gmail.com',
     packages=['bulkhasher'],
