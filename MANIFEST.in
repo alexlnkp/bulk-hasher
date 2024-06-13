@@ -1,0 +1,3 @@
+include CMakeLists.txt
+include *.c 
+include *.h

@@ -7,12 +7,4 @@ if [[ ! -d ".venv" ]]; then
 fi
 
 source .venv/bin/activate
-
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release --parallel
-
-cp build/bulkhasher.* bulkhasher/
-
-export PREBUILT_BINARY=$(pwd)/build/bulkhasher.so
-
 python -m build
