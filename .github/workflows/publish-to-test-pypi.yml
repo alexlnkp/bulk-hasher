@@ -24,9 +24,9 @@ jobs:
         build auditwheel
         --user
     - name: Build a binary wheel and a source tarball
-      run: ./autobuild
+      run: python -m build
     - name: Convert binary wheel to manylinux
-      run: auditwheel repair dist/*.whl
+      run: auditwheel repair dist/*.whl --plat manylinux2014_x86_64
     - name: Store the distribution packages
       uses: actions/upload-artifact@v3
       with:
