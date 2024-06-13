@@ -11,7 +11,6 @@ setup(
     name = 'bulkhasher',
     version = '0.0.2',
     description = 'Module for bulk hashing of files',
-    url = None,
     author = 'Alex Murkoff',
     author_email = '413x1nkp@gmail.com',
     packages=['bulkhasher'],
@@ -21,5 +20,5 @@ setup(
             f'bulkhasher.{LIBRARY_SUFFIX}'
         ]
     },
-    distclass=BinaryDistribution
+    distclass=BinaryDistribution,
 )
