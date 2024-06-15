@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
-project(RVC_Hasher)
+project(Hasher)
+
+option(ENABLE_TESTING "Enable testing of the C code" OFF)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 find_package(OpenMP REQUIRED)
@@ -26,4 +28,6 @@ endif()
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-target_compile_options(bulkhasher PRIVATE -Wall -Wextra -Wpedantic -O3 -fopenmp)
+if(ENABLE_TESTING)
+    add_subdirectory(testing)
+endif()
