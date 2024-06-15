@@ -318,7 +318,7 @@ char* C_get_hash_from_file(char* file_to_hash, char* sha_file) {
             char* filename = strtok(line, " = ");
             char* stored_hash = strtok(NULL, " = ");
             fclose(fp);
-            return strdup(stored_hash);
+            return stored_hash;
         }
     }
     fclose(fp);
@@ -360,3 +360,25 @@ static PyObject* version(PyObject* self) {
     return Py_BuildValue("s", "0.0.1");
 }
 // ---------------
+
+static PyMethodDef HashMethods[] = {
+    {"hash_file", (PyCFunction)hash_file, METH_VARARGS, "Get the SHA256 hash of the file specified"},
+    {"check_hashes_against_file", (PyCFunction)check_hashes_against_file, METH_VARARGS, "Check all files in the file specified against corresponding SHA256 hashes, returns the number of mismatched hashes"},
+    {"regenerate_hashes", (PyCFunction)regenerate_hashes, METH_VARARGS, "Regenerate SHA256 hashes for all files in the directory specified, writing the results to the specified file"},
+    {"get_hash_from_file", (PyCFunction)get_hash_from_file, METH_VARARGS, "Get the SHA256 hash of the file specified in the sha256 file"},
+    {"version", (PyCFunction)version, METH_NOARGS, "Get the version of the program"},
+    {NULL, NULL, 0, NULL}
+};
+
+static struct PyModuleDef bulkhashermodule = {
+    PyModuleDef_HEAD_INIT,
+    "hash",
+    "SHA256 hashing module",
+    -1,
+    HashMethods,
+    .m_slots = NULL,
+};
+
+PyMODINIT_FUNC PyInit_bulkhasher() {
+    return PyModule_Create(&bulkhashermodule);
+}
