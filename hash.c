@@ -82,6 +82,8 @@ char** hash_files(HashingDirectory* dir) {
     }
 
     omp_destroy_lock(&lock);
+
+
     return hashes;
 }
 
@@ -346,10 +348,12 @@ static PyObject* check_hashes_against_file(PyObject* self, PyObject* args) {
 
 }
 static PyObject* regenerate_hashes(PyObject* self, PyObject* args) {
-    char* path; char* out_file;
-    if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
-    C_regenerate_hashes(path, out_file);
-    Py_INCREF(Py_None); return Py_None;
+    Py_BEGIN_ALLOW_THREADS
+        char* path; char* out_file;
+        if (!PyArg_ParseTuple(args, "ss", &path, &out_file)) return NULL;
+        C_regenerate_hashes(path, out_file);
+        Py_INCREF(Py_None); return Py_None;
+    Py_END_ALLOW_THREADS
 }
 static PyObject* get_hash_from_file(PyObject* self, PyObject* args) {
     char* file_to_hash; char* sha_file;
