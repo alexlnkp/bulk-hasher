@@ -31,8 +31,6 @@ class CMakeBuild(build_ext):
         subprocess.check_call(
             [
                 'cmake',
-                '-DPYTHON_INCLUDE_DIR=$(python3 -c "import sysconfig; print(sysconfig.get_path(\'include\'))")',
-                '-DPYTHON_LIBRARY=$(python3 -c "import sysconfig; print(sysconfig.get_config_var(\'LIBDIR\'))")',
                 '-B',
                 self.build_temp,
                 '-DCMAKE_BUILD_TYPE=' + cfg,
