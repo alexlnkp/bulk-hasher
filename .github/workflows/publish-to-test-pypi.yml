@@ -5,12 +5,17 @@ on: push
 jobs:
   build:
     name: Build distribution 📦
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
 
+    - name: install python3 dev
+      run: sudo apt-get install python3-dev
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
