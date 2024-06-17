@@ -28,7 +28,17 @@ class CMakeBuild(build_ext):
         os.makedirs(self.build_temp, exist_ok=True)
         os.makedirs(self.build_lib, exist_ok=True)
 
-        subprocess.check_call(['cmake', '-B', self.build_temp, '-DCMAKE_BUILD_TYPE=' + cfg, ext.sourcedir] + cmake_args, cwd=self.build_temp)
+        subprocess.check_call(
+            [
+                'cmake',
+                '-DPYTHON_INCLUDE_DIR=$(python -c "import sysconfig; print(sysconfig.get_path(\'include\'))")',
+                '-DPYTHON_LIBRARY=$(python -c "import sysconfig; print(sysconfig.get_config_var(\'LIBDIR\'))")',
+                '-B',
+                self.build_temp,
+                '-DCMAKE_BUILD_TYPE=' + cfg,
+                ext.sourcedir
+            ] + cmake_args, cwd=self.build_temp
+        )
         subprocess.check_call(['cmake', '--build', self.build_temp] + build_args, cwd=self.build_temp)
 
 
