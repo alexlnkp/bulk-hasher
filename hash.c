@@ -361,7 +361,7 @@ static PyObject* get_hash_from_file(PyObject* self, PyObject* args) {
     return Py_BuildValue("s", C_get_hash_from_file(file_to_hash, sha_file));
 }
 static PyObject* version(PyObject* self) {
-    return Py_BuildValue("s", "0.0.1");
+    return Py_BuildValue("s", "0.0.5");
 }
 // ---------------
 

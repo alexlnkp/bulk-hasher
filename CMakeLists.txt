@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 
 project(Hasher)
 
 option(ENABLE_TESTING "Enable testing of the C code" OFF)
 
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(OpenMP REQUIRED)
 
 # Define the new shared library target
@@ -13,7 +13,7 @@ target_compile_options(bulkhasher PRIVATE -Wall -Wextra -Wpedantic -O3 -flto -fo
 
 # Include Python headers and OpenMP
 target_include_directories(bulkhasher PRIVATE ${Python3_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(bulkhasher PRIVATE Python3::Python Python3::Module OpenMP::OpenMP_C)
+target_link_libraries(bulkhasher PRIVATE Python3::Module OpenMP::OpenMP_C)
 
 # Set the output name of the library to 'bulkhasher' without any prefix (like 'lib')
 set_target_properties(bulkhasher PROPERTIES PREFIX "")

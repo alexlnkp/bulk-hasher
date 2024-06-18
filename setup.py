@@ -44,7 +44,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name = 'bulkhasher',
-    version = '0.0.4',
+    version = '0.0.5',
     description = 'Module for bulk hashing of files',
     long_description="Made on C",
     author = 'Alex Murkoff',
