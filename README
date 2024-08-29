@@ -1,4 +1,4 @@
-Hash files in bulk with Python!
+Hash files in bulk with Python! (WIP)
 
 Functions included:
 def hash_file(filename: str) -> str:
